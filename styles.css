@@ -1,0 +1,266 @@
+:root {
+  color-scheme: light;
+  --bg: #f4f1ea;
+  --card: #fffdf8;
+  --text: #222222;
+  --muted: #6a635b;
+  --accent: #c96c3a;
+  --accent-hover: #af5c30;
+  --border: #e4d9ca;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Segoe UI", sans-serif;
+  background:
+    radial-gradient(circle at top left, #f8e6d9 0, transparent 30%),
+    linear-gradient(180deg, #f7f2eb 0%, var(--bg) 100%);
+  color: var(--text);
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.app {
+  width: min(100%, 480px);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 20px 50px rgba(84, 60, 40, 0.12);
+  text-align: center;
+}
+
+h1 {
+  margin: 0 0 16px;
+  font-size: 2rem;
+  letter-spacing: 0.04em;
+}
+
+.form {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  font-size: 1rem;
+  outline: none;
+}
+
+input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(201, 108, 58, 0.15);
+}
+
+button {
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+}
+
+button:hover {
+  transform: translateY(-1px);
+}
+
+button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+  transform: none;
+  box-shadow: none;
+}
+
+button:focus-visible {
+  outline: 3px solid rgba(201, 108, 58, 0.2);
+  outline-offset: 3px;
+}
+
+.add-button {
+  justify-self: center;
+  min-width: 180px;
+  padding: 13px 24px;
+  background: linear-gradient(135deg, #d97d48 0%, var(--accent) 100%);
+  color: #ffffff;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  box-shadow: 0 10px 24px rgba(201, 108, 58, 0.28);
+}
+
+.add-button:hover {
+  background: var(--accent-hover);
+  box-shadow: 0 12px 28px rgba(175, 92, 48, 0.3);
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 10px;
+}
+
+li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: #fffaf3;
+  text-align: left;
+}
+
+.task-main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  flex: 1;
+}
+
+.task-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.task-check {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
+  flex-shrink: 0;
+}
+
+.task-text {
+  flex: 1;
+  word-break: break-word;
+  transition: color 0.2s ease, text-decoration-color 0.2s ease;
+}
+
+.task-edit-input {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 10px;
+  font-size: 0.95rem;
+}
+
+.task-loading {
+  flex-shrink: 0;
+  color: var(--accent);
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+li.completed .task-text {
+  color: var(--muted);
+  text-decoration: line-through;
+  text-decoration-thickness: 2px;
+}
+
+li.editing {
+  background: #fff7ee;
+}
+
+li.saving {
+  opacity: 0.88;
+}
+
+.edit-button {
+  flex-shrink: 0;
+  min-width: 80px;
+  padding: 10px 14px;
+  background: #e7d7c6;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.edit-button:hover {
+  background: #dac5af;
+}
+
+.save-button {
+  flex-shrink: 0;
+  min-width: 80px;
+  padding: 10px 14px;
+  background: #caa768;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.save-button:hover {
+  background: #b89453;
+}
+
+.cancel-button {
+  flex-shrink: 0;
+  min-width: 96px;
+  padding: 10px 14px;
+  background: #eee5d8;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.cancel-button:hover {
+  background: #dfd2c0;
+}
+
+.delete-button {
+  flex-shrink: 0;
+  min-width: 80px;
+  padding: 10px 14px;
+  background: #c96c3a;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.delete-button:hover {
+  background: #af5c30;
+}
+
+.empty {
+  margin: 0;
+  color: var(--muted);
+  text-align: center;
+  padding: 20px 0 8px;
+}
+
+.status {
+  margin: 0 0 16px;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+@media (max-width: 520px) {
+  li {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .task-actions {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .edit-button,
+  .save-button,
+  .cancel-button,
+  .delete-button {
+    align-self: center;
+    width: 100%;
+  }
+}

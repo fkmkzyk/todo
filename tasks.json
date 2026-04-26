@@ -1,0 +1,37 @@
+[
+  {
+    "id": "4b4e2de0-5ea4-4c75-9745-f83d2ecf6b39",
+    "text": "ホンダでオイル交換",
+    "completed": false
+  },
+  {
+    "id": "2440d1b7-e5f2-47d2-9d90-e6cd2f53d639",
+    "text": "ガソリン給油",
+    "completed": true
+  },
+  {
+    "id": "0c7f4cb7-2500-4f7f-a2e2-ee97ff67701b",
+    "text": "セブンイレブンで支払",
+    "completed": false
+  },
+  {
+    "id": "bc603dd8-cd39-43d7-b0b0-5e1b3a730ec8",
+    "text": "徳山市で物受け取り",
+    "completed": false
+  },
+  {
+    "id": "5a9df527-a9d3-4b51-a766-48052f2d3da0",
+    "text": "出発準備",
+    "completed": true
+  },
+  {
+    "id": "dce13f69-8927-4d32-a86c-66d6905b5173",
+    "text": "出発準備と着替え",
+    "completed": false
+  },
+  {
+    "id": "b088777d-63a5-4185-aba1-cccbcb3520d6",
+    "text": "ランチ店決め",
+    "completed": false
+  }
+]
