@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: todo-web-app
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start

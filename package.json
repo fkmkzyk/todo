@@ -5,5 +5,9 @@
   "description": "Simple web-accessible TODO app",
   "scripts": {
     "start": "node server.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.104.1",
+    "dotenv": "^17.4.2"
   }
 }
