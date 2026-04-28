@@ -13,6 +13,7 @@ const SCRIPT_FILE = path.join(__dirname, "app.js");
 const STYLE_FILE = path.join(__dirname, "styles.css");
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
 const SUPABASE_TASKS_TABLE = process.env.SUPABASE_TASKS_TABLE || "tasks";
 const TASKS_FILE = process.env.TASKS_FILE
   ? path.resolve(process.env.TASKS_FILE)
@@ -71,148 +72,6 @@ function getSupabaseClient() {
   return supabaseClient;
 }
 
-async function listTasks() {
-  if (!useSupabase) {
-    return readTasks();
-  }
-
-  const supabase = getSupabaseClient();
-  const { data, error } = await supabase
-    .from(SUPABASE_TASKS_TABLE)
-    .select("id, text, completed")
-    .order("created_at", { ascending: true });
-
-  if (error) {
-    throw error;
-  }
-
-  return Array.isArray(data) ? data.map(normalizeTask).filter(Boolean) : [];
-}
-
-async function getTaskById(taskId) {
-  if (!useSupabase) {
-    return readTasks().find((item) => item.id === taskId) || null;
-  }
-
-  const supabase = getSupabaseClient();
-  const { data, error } = await supabase
-    .from(SUPABASE_TASKS_TABLE)
-    .select("id, text, completed")
-    .eq("id", taskId)
-    .maybeSingle();
-
-  if (error) {
-    throw error;
-  }
-
-  return normalizeTask(data);
-}
-
-async function createTask(taskInput) {
-  if (!useSupabase) {
-    const tasks = readTasks();
-    const task = {
-      id: createTaskId(),
-      text: taskInput.text.trim(),
-      completed: Boolean(taskInput.completed)
-    };
-
-    tasks.push(task);
-    writeTasks(tasks);
-    return task;
-  }
-
-  const supabase = getSupabaseClient();
-  const { data, error } = await supabase
-    .from(SUPABASE_TASKS_TABLE)
-    .insert({
-      text: taskInput.text.trim(),
-      completed: Boolean(taskInput.completed)
-    })
-    .select("id, text, completed")
-    .single();
-
-  if (error) {
-    throw error;
-  }
-
-  return normalizeTask(data);
-}
-
-async function updateTask(taskId, updates) {
-  if (!useSupabase) {
-    const tasks = readTasks();
-    const task = tasks.find((item) => item.id === taskId);
-
-    if (!task) {
-      return null;
-    }
-
-    if ("text" in updates) {
-      task.text = updates.text.trim();
-    }
-
-    if ("completed" in updates) {
-      task.completed = Boolean(updates.completed);
-    }
-
-    writeTasks(tasks);
-    return task;
-  }
-
-  const nextUpdates = {};
-
-  if ("text" in updates) {
-    nextUpdates.text = updates.text.trim();
-  }
-
-  if ("completed" in updates) {
-    nextUpdates.completed = Boolean(updates.completed);
-  }
-
-  const supabase = getSupabaseClient();
-  const { data, error } = await supabase
-    .from(SUPABASE_TASKS_TABLE)
-    .update(nextUpdates)
-    .eq("id", taskId)
-    .select("id, text, completed")
-    .maybeSingle();
-
-  if (error) {
-    throw error;
-  }
-
-  return normalizeTask(data);
-}
-
-async function deleteTaskById(taskId) {
-  if (!useSupabase) {
-    const tasks = readTasks();
-    const nextTasks = tasks.filter((item) => item.id !== taskId);
-
-    if (nextTasks.length === tasks.length) {
-      return false;
-    }
-
-    writeTasks(nextTasks);
-    return true;
-  }
-
-  const supabase = getSupabaseClient();
-  const { data, error } = await supabase
-    .from(SUPABASE_TASKS_TABLE)
-    .delete()
-    .eq("id", taskId)
-    .select("id")
-    .maybeSingle();
-
-  if (error) {
-    throw error;
-  }
-
-  return Boolean(data);
-}
-
 function sendJson(response, statusCode, payload) {
   response.writeHead(statusCode, {
     "Content-Type": "application/json; charset=utf-8",
@@ -259,6 +118,196 @@ function readJsonBody(request) {
   });
 }
 
+function getAccessToken(request) {
+  const authorization = request.headers.authorization || "";
+  const [scheme, token] = authorization.split(" ");
+
+  if (scheme !== "Bearer" || !token) {
+    return null;
+  }
+
+  return token;
+}
+
+async function getAuthenticatedUser(request) {
+  if (!useSupabase) {
+    return { id: "local-user" };
+  }
+
+  const accessToken = getAccessToken(request);
+
+  if (!accessToken) {
+    return null;
+  }
+
+  const supabase = getSupabaseClient();
+  const { data, error } = await supabase.auth.getUser(accessToken);
+
+  if (error) {
+    throw error;
+  }
+
+  return data.user || null;
+}
+
+async function listTasks(userId) {
+  if (!useSupabase) {
+    return readTasks();
+  }
+
+  const supabase = getSupabaseClient();
+  const { data, error } = await supabase
+    .from(SUPABASE_TASKS_TABLE)
+    .select("id, text, completed")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: true });
+
+  if (error) {
+    throw error;
+  }
+
+  return Array.isArray(data) ? data.map(normalizeTask).filter(Boolean) : [];
+}
+
+async function getTaskById(taskId, userId) {
+  if (!useSupabase) {
+    return readTasks().find((item) => item.id === taskId) || null;
+  }
+
+  const supabase = getSupabaseClient();
+  const { data, error } = await supabase
+    .from(SUPABASE_TASKS_TABLE)
+    .select("id, text, completed")
+    .eq("id", taskId)
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  if (error) {
+    throw error;
+  }
+
+  return normalizeTask(data);
+}
+
+async function createTask(taskInput, userId) {
+  if (!useSupabase) {
+    const tasks = readTasks();
+    const task = {
+      id: createTaskId(),
+      text: taskInput.text.trim(),
+      completed: Boolean(taskInput.completed)
+    };
+
+    tasks.push(task);
+    writeTasks(tasks);
+    return task;
+  }
+
+  const supabase = getSupabaseClient();
+  const { data, error } = await supabase
+    .from(SUPABASE_TASKS_TABLE)
+    .insert({
+      text: taskInput.text.trim(),
+      completed: Boolean(taskInput.completed),
+      user_id: userId
+    })
+    .select("id, text, completed")
+    .single();
+
+  if (error) {
+    throw error;
+  }
+
+  return normalizeTask(data);
+}
+
+async function updateTask(taskId, updates, userId) {
+  if (!useSupabase) {
+    const tasks = readTasks();
+    const task = tasks.find((item) => item.id === taskId);
+
+    if (!task) {
+      return null;
+    }
+
+    if ("text" in updates) {
+      task.text = updates.text.trim();
+    }
+
+    if ("completed" in updates) {
+      task.completed = Boolean(updates.completed);
+    }
+
+    writeTasks(tasks);
+    return task;
+  }
+
+  const nextUpdates = {};
+
+  if ("text" in updates) {
+    nextUpdates.text = updates.text.trim();
+  }
+
+  if ("completed" in updates) {
+    nextUpdates.completed = Boolean(updates.completed);
+  }
+
+  const supabase = getSupabaseClient();
+  const { data, error } = await supabase
+    .from(SUPABASE_TASKS_TABLE)
+    .update(nextUpdates)
+    .eq("id", taskId)
+    .eq("user_id", userId)
+    .select("id, text, completed")
+    .maybeSingle();
+
+  if (error) {
+    throw error;
+  }
+
+  return normalizeTask(data);
+}
+
+async function deleteTaskById(taskId, userId) {
+  if (!useSupabase) {
+    const tasks = readTasks();
+    const nextTasks = tasks.filter((item) => item.id !== taskId);
+
+    if (nextTasks.length === tasks.length) {
+      return false;
+    }
+
+    writeTasks(nextTasks);
+    return true;
+  }
+
+  const supabase = getSupabaseClient();
+  const { data, error } = await supabase
+    .from(SUPABASE_TASKS_TABLE)
+    .delete()
+    .eq("id", taskId)
+    .eq("user_id", userId)
+    .select("id")
+    .maybeSingle();
+
+  if (error) {
+    throw error;
+  }
+
+  return Boolean(data);
+}
+
+async function requireUser(request, response) {
+  const user = await getAuthenticatedUser(request);
+
+  if (!user) {
+    sendJson(response, 401, { error: "Authentication required." });
+    return null;
+  }
+
+  return user;
+}
+
 const server = http.createServer(async (request, response) => {
   const requestUrl = new URL(request.url, `http://${request.headers.host}`);
   const taskIdMatch = requestUrl.pathname.match(/^\/api\/tasks\/([^/]+)$/);
@@ -279,12 +328,30 @@ const server = http.createServer(async (request, response) => {
       return;
     }
 
+    if (request.method === "GET" && requestUrl.pathname === "/api/config") {
+      sendJson(response, 200, {
+        supabaseUrl: SUPABASE_URL || "",
+        supabaseAnonKey: SUPABASE_ANON_KEY || ""
+      });
+      return;
+    }
+
     if (request.method === "GET" && requestUrl.pathname === "/api/tasks") {
-      sendJson(response, 200, await listTasks());
+      const user = await requireUser(request, response);
+      if (!user) {
+        return;
+      }
+
+      sendJson(response, 200, await listTasks(user.id));
       return;
     }
 
     if (request.method === "POST" && requestUrl.pathname === "/api/tasks") {
+      const user = await requireUser(request, response);
+      if (!user) {
+        return;
+      }
+
       let body;
 
       try {
@@ -299,13 +366,18 @@ const server = http.createServer(async (request, response) => {
         return;
       }
 
-      const task = await createTask(body);
+      const task = await createTask(body, user.id);
       sendJson(response, 201, task);
       return;
     }
 
     if (request.method === "GET" && taskIdMatch) {
-      const task = await getTaskById(taskIdMatch[1]);
+      const user = await requireUser(request, response);
+      if (!user) {
+        return;
+      }
+
+      const task = await getTaskById(taskIdMatch[1], user.id);
 
       if (!task) {
         sendJson(response, 404, { error: "Task not found." });
@@ -317,6 +389,11 @@ const server = http.createServer(async (request, response) => {
     }
 
     if (request.method === "PATCH" && taskIdMatch) {
+      const user = await requireUser(request, response);
+      if (!user) {
+        return;
+      }
+
       let body;
 
       try {
@@ -331,7 +408,7 @@ const server = http.createServer(async (request, response) => {
         return;
       }
 
-      const task = await updateTask(taskIdMatch[1], body);
+      const task = await updateTask(taskIdMatch[1], body, user.id);
 
       if (!task) {
         sendJson(response, 404, { error: "Task not found." });
@@ -343,7 +420,12 @@ const server = http.createServer(async (request, response) => {
     }
 
     if (request.method === "DELETE" && taskIdMatch) {
-      const deleted = await deleteTaskById(taskIdMatch[1]);
+      const user = await requireUser(request, response);
+      if (!user) {
+        return;
+      }
+
+      const deleted = await deleteTaskById(taskIdMatch[1], user.id);
 
       if (!deleted) {
         sendJson(response, 404, { error: "Task not found." });

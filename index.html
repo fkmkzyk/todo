@@ -7,17 +7,40 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <main class="app">
-    <h1>TODO</h1>
-    <p class="status" id="status-message"></p>
-    <form class="form" id="todo-form">
-      <input id="todo-input" type="text" placeholder="タスクを入力" autocomplete="off">
-      <button class="add-button" type="submit">追加</button>
-    </form>
-    <ul id="todo-list"></ul>
-    <p class="empty" id="empty-message">まだタスクがありません</p>
+  <main class="app-shell">
+    <section class="panel auth-panel" id="auth-card">
+      <p class="eyebrow">PRIVATE TODO</p>
+      <h1 id="auth-title">ログイン</h1>
+      <p class="lead">メールアドレスごとにタスクを分けて保存します。</p>
+      <p class="status" id="auth-status-message"></p>
+      <form class="form" id="auth-form">
+        <input id="auth-email" type="email" placeholder="メールアドレス" autocomplete="email">
+        <input id="auth-password" type="password" placeholder="パスワード" autocomplete="current-password">
+        <button class="add-button" id="auth-submit-button" type="submit">ログイン</button>
+      </form>
+      <button class="secondary-button" id="auth-mode-toggle" type="button">アカウントがない場合は新規登録</button>
+    </section>
+
+    <section class="panel todo-panel" id="todo-card" hidden>
+      <div class="panel-header">
+        <div>
+          <p class="eyebrow">SIGNED IN</p>
+          <h1>TODO</h1>
+          <p class="lead user-email" id="user-email"></p>
+        </div>
+        <button class="secondary-button" id="sign-out-button" type="button">ログアウト</button>
+      </div>
+      <p class="status" id="todo-status-message"></p>
+      <form class="form" id="todo-form">
+        <input id="todo-input" type="text" placeholder="タスクを入力" autocomplete="off">
+        <button class="add-button" type="submit">追加</button>
+      </form>
+      <ul id="todo-list"></ul>
+      <p class="empty" id="empty-message">まだタスクがありません</p>
+    </section>
   </main>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="app.js"></script>
 </body>
 </html>

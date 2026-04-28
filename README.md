@@ -1,6 +1,6 @@
 # TODO Web App
 
-シンプルな TODO アプリです。Node.js の小さな HTTP サーバーで動作します。Supabase 環境変数が設定されている場合は DB に保存し、未設定の場合は `tasks.json` に保存します。
+メールアドレスでログインして使う TODO アプリです。Node.js の小さな HTTP サーバーで動作し、ユーザーごとのタスクを Supabase に保存します。
 
 ## ローカル起動
 
@@ -12,6 +12,8 @@ npm start
 
 ## できること
 
+- メールアドレス / パスワードでの新規登録
+- ログイン / ログアウト
 - タスク追加
 - 完了状態の切り替え
 - タスク編集
@@ -37,14 +39,18 @@ npm start
 
 1. Supabase で新しいプロジェクトを作成する
 2. SQL Editor で [supabase-schema.sql](C:/codex-work/test/supabase-schema.sql) の内容を実行する
-3. Project Settings から `SUPABASE_URL` と `SUPABASE_SERVICE_ROLE_KEY` を取得する
-4. `.env.example` を参考に環境変数を設定して起動する
+3. Authentication で Email provider を有効にする
+4. Project Settings から `SUPABASE_URL`、`SUPABASE_SERVICE_ROLE_KEY`、`SUPABASE_ANON_KEY` を取得する
+5. `.env.example` を参考に環境変数を設定して起動する
+
+この SQL は既存の `tasks` テーブルにも適用できます。ただし、旧データで `user_id` がない行は削除されます。
 
 ローカル例:
 
 ```bash
 SUPABASE_URL=...
 SUPABASE_SERVICE_ROLE_KEY=...
+SUPABASE_ANON_KEY=...
 npm start
 ```
 
@@ -52,6 +58,7 @@ npm start
 
 - `SUPABASE_URL`
 - `SUPABASE_SERVICE_ROLE_KEY`
+- `SUPABASE_ANON_KEY`
 - `SUPABASE_TASKS_TABLE` 省略時は `tasks`
 - `PORT`
 
@@ -59,4 +66,4 @@ npm start
 
 `SUPABASE_SERVICE_ROLE_KEY` はサーバー側だけで使ってください。フロントエンドの JavaScript に埋め込んではいけません。
 
-Supabase を設定しない場合は `tasks.json` に保存されます。ホスティング先によっては再起動や再デプロイで内容が消えることがあります。
+`SUPABASE_ANON_KEY` はブラウザに配布される前提のキーです。代わりに `tasks` テーブルの RLS ポリシーでアクセスを制御します。

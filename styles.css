@@ -1,12 +1,15 @@
 :root {
   color-scheme: light;
-  --bg: #f4f1ea;
-  --card: #fffdf8;
-  --text: #222222;
-  --muted: #6a635b;
-  --accent: #c96c3a;
-  --accent-hover: #af5c30;
-  --border: #e4d9ca;
+  --bg: #efe5d3;
+  --panel: rgba(255, 250, 243, 0.92);
+  --panel-strong: #fffdf8;
+  --text: #221d18;
+  --muted: #6f665d;
+  --accent: #b85f2f;
+  --accent-hover: #9b4e24;
+  --accent-soft: #ead5c4;
+  --border: rgba(137, 99, 67, 0.18);
+  --shadow: 0 24px 60px rgba(77, 51, 30, 0.15);
 }
 
 * {
@@ -18,28 +21,59 @@ body {
   min-height: 100vh;
   font-family: "Segoe UI", sans-serif;
   background:
-    radial-gradient(circle at top left, #f8e6d9 0, transparent 30%),
-    linear-gradient(180deg, #f7f2eb 0%, var(--bg) 100%);
+    radial-gradient(circle at top left, rgba(255, 211, 171, 0.6) 0, transparent 24%),
+    radial-gradient(circle at right bottom, rgba(225, 160, 108, 0.28) 0, transparent 28%),
+    linear-gradient(180deg, #f6efe3 0%, var(--bg) 100%);
   color: var(--text);
-  display: grid;
-  place-items: center;
-  padding: 24px;
 }
 
-.app {
-  width: min(100%, 480px);
-  background: var(--card);
+.app-shell {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 28px;
+}
+
+.panel {
+  width: min(100%, 560px);
+  background: var(--panel);
+  backdrop-filter: blur(10px);
   border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 24px;
-  box-shadow: 0 20px 50px rgba(84, 60, 40, 0.12);
-  text-align: center;
+  border-radius: 24px;
+  padding: 28px;
+  box-shadow: var(--shadow);
+}
+
+.panel-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  color: var(--accent);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
 }
 
 h1 {
-  margin: 0 0 16px;
-  font-size: 2rem;
-  letter-spacing: 0.04em;
+  margin: 0 0 10px;
+  font-size: clamp(2rem, 5vw, 2.6rem);
+  line-height: 1;
+}
+
+.lead {
+  margin: 0 0 20px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.user-email {
+  margin-bottom: 0;
 }
 
 .form {
@@ -50,24 +84,26 @@ h1 {
 
 input {
   width: 100%;
-  padding: 12px 14px;
+  padding: 13px 15px;
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 14px;
   font-size: 1rem;
+  background: var(--panel-strong);
+  color: var(--text);
   outline: none;
 }
 
 input:focus {
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(201, 108, 58, 0.15);
+  box-shadow: 0 0 0 4px rgba(184, 95, 47, 0.12);
 }
 
 button {
   border: none;
-  border-radius: 12px;
+  border-radius: 14px;
   cursor: pointer;
   font-size: 0.95rem;
-  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, opacity 0.18s ease;
 }
 
 button:hover {
@@ -82,24 +118,34 @@ button:disabled {
 }
 
 button:focus-visible {
-  outline: 3px solid rgba(201, 108, 58, 0.2);
+  outline: 3px solid rgba(184, 95, 47, 0.18);
   outline-offset: 3px;
 }
 
 .add-button {
-  justify-self: center;
-  min-width: 180px;
-  padding: 13px 24px;
-  background: linear-gradient(135deg, #d97d48 0%, var(--accent) 100%);
+  justify-self: stretch;
+  padding: 14px 20px;
+  background: linear-gradient(135deg, #d67842 0%, var(--accent) 100%);
   color: #ffffff;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.04em;
-  box-shadow: 0 10px 24px rgba(201, 108, 58, 0.28);
+  box-shadow: 0 12px 24px rgba(184, 95, 47, 0.24);
 }
 
 .add-button:hover {
   background: var(--accent-hover);
-  box-shadow: 0 12px 28px rgba(175, 92, 48, 0.3);
+}
+
+.secondary-button {
+  width: 100%;
+  padding: 13px 16px;
+  background: var(--accent-soft);
+  color: var(--text);
+  font-weight: 600;
+}
+
+.secondary-button:hover {
+  background: #e0c7b3;
 }
 
 ul {
@@ -117,8 +163,8 @@ li {
   gap: 12px;
   padding: 14px 16px;
   border: 1px solid var(--border);
-  border-radius: 14px;
-  background: #fffaf3;
+  border-radius: 16px;
+  background: var(--panel-strong);
   text-align: left;
 }
 
@@ -147,7 +193,6 @@ li {
 .task-text {
   flex: 1;
   word-break: break-word;
-  transition: color 0.2s ease, text-decoration-color 0.2s ease;
 }
 
 .task-edit-input {
@@ -161,7 +206,7 @@ li {
   flex-shrink: 0;
   color: var(--accent);
   font-size: 0.85rem;
-  font-weight: 600;
+  font-weight: 700;
   white-space: nowrap;
 }
 
@@ -179,26 +224,28 @@ li.saving {
   opacity: 0.88;
 }
 
-.edit-button {
+.edit-button,
+.save-button,
+.cancel-button,
+.delete-button {
   flex-shrink: 0;
   min-width: 80px;
   padding: 10px 14px;
-  background: #e7d7c6;
-  color: var(--text);
   font-weight: 600;
+}
+
+.edit-button {
+  background: #ead8c8;
+  color: var(--text);
 }
 
 .edit-button:hover {
-  background: #dac5af;
+  background: #dfc7b4;
 }
 
 .save-button {
-  flex-shrink: 0;
-  min-width: 80px;
-  padding: 10px 14px;
   background: #caa768;
   color: #ffffff;
-  font-weight: 600;
 }
 
 .save-button:hover {
@@ -206,12 +253,8 @@ li.saving {
 }
 
 .cancel-button {
-  flex-shrink: 0;
-  min-width: 96px;
-  padding: 10px 14px;
   background: #eee5d8;
   color: var(--text);
-  font-weight: 600;
 }
 
 .cancel-button:hover {
@@ -219,12 +262,8 @@ li.saving {
 }
 
 .delete-button {
-  flex-shrink: 0;
-  min-width: 80px;
-  padding: 10px 14px;
   background: #c96c3a;
   color: #ffffff;
-  font-weight: 600;
 }
 
 .delete-button:hover {
@@ -241,11 +280,22 @@ li.saving {
 .status {
   margin: 0 0 16px;
   color: var(--muted);
-  font-size: 0.9rem;
-  line-height: 1.5;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  min-height: 1.5em;
 }
 
-@media (max-width: 520px) {
+@media (max-width: 640px) {
+  .app-shell {
+    padding: 16px;
+  }
+
+  .panel {
+    padding: 20px;
+    border-radius: 20px;
+  }
+
+  .panel-header,
   li {
     flex-direction: column;
     align-items: stretch;
@@ -260,7 +310,6 @@ li.saving {
   .save-button,
   .cancel-button,
   .delete-button {
-    align-self: center;
     width: 100%;
   }
 }
